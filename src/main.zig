@@ -2,7 +2,7 @@ const std = @import("std");
 const info = std.log.info;
 
 const c = @cImport({
-    @cDefine("CL_TARGET_OPENCL_VERSION", "110");
+    @cDefine("CL_TARGET_OPENCL_VERSION", "120");
     @cInclude("CL/cl.h");
 });
 
@@ -144,10 +144,10 @@ fn run_test(device: c.cl_device_id) CLError!void {
     }
 
     // Execute kernel
-    if (c.clSetKernelArg(kernel, 0, @sizeOf(c.cl_mem), input_buffer) != c.CL_SUCCESS) {
+    if (c.clSetKernelArg(kernel, 0, @sizeOf(c.cl_mem), &input_buffer) != c.CL_SUCCESS) {
         return CLError.SetKernelArgFailed;
     }
-    if (c.clSetKernelArg(kernel, 1, @sizeOf(c.cl_mem), output_buffer) != c.CL_SUCCESS) {
+    if (c.clSetKernelArg(kernel, 1, @sizeOf(c.cl_mem), &output_buffer) != c.CL_SUCCESS) {
         return CLError.SetKernelArgFailed;
     }
 
