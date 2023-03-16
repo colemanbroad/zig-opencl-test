@@ -41,7 +41,7 @@ fn get_cl_device() CLError!c.cl_device_id {
     }
     info("{} cl platform(s) found:", .{@intCast(u32, platform_count)});
 
-    for (platform_ids[0..platform_count]) |id, i| {
+    for (platform_ids[0..platform_count], 0..) |id, i| {
         var name: [1024]u8 = undefined;
         var name_len: usize = undefined;
         if (c.clGetPlatformInfo(id, c.CL_PLATFORM_NAME, name.len, &name, &name_len) != c.CL_SUCCESS) {
@@ -63,7 +63,7 @@ fn get_cl_device() CLError!c.cl_device_id {
     }
     info("{} cl device(s) found on platform 0:", .{@intCast(u32, device_count)});
 
-    for (device_ids[0..device_count]) |id, i| {
+    for (device_ids[0..device_count], 0..) |id, i| {
         var name: [1024]u8 = undefined;
         var name_len: usize = undefined;
         if (c.clGetDeviceInfo(id, c.CL_DEVICE_NAME, name.len, &name, &name_len) != c.CL_SUCCESS) {
@@ -120,7 +120,7 @@ fn run_test(device: c.cl_device_id) CLError!void {
     // Create buffers
     var input_array = init: {
         var init_value: [1024]i32 = undefined;
-        for (init_value) |*pt, i| {
+        for (&init_value, 0..) |*pt, i| {
             pt.* = @intCast(i32, i);
         }
         break :init init_value;
@@ -144,10 +144,10 @@ fn run_test(device: c.cl_device_id) CLError!void {
     }
 
     // Execute kernel
-    if (c.clSetKernelArg(kernel, 0, @sizeOf(c.cl_mem), &input_buffer) != c.CL_SUCCESS) {
+    if (c.clSetKernelArg(kernel, 0, @sizeOf(c.cl_mem), input_buffer) != c.CL_SUCCESS) {
         return CLError.SetKernelArgFailed;
     }
-    if (c.clSetKernelArg(kernel, 1, @sizeOf(c.cl_mem), &output_buffer) != c.CL_SUCCESS) {
+    if (c.clSetKernelArg(kernel, 1, @sizeOf(c.cl_mem), output_buffer) != c.CL_SUCCESS) {
         return CLError.SetKernelArgFailed;
     }
 
@@ -166,7 +166,7 @@ fn run_test(device: c.cl_device_id) CLError!void {
 
     info("** results **", .{});
 
-    for (output_array) |val, i| {
+    for (output_array, 0..) |val, i| {
         if (i % 100 == 0) {
             info("{} ^ 2 = {}", .{ i, val });
         }
